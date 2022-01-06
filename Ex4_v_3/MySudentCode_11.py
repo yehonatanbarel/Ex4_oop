@@ -79,10 +79,24 @@ def my_scale(data, x=False, y=False):
 
 radius = 15
 
-client.add_agent("{\"id\":0}")
+def put_agent_on_graph():
+    num_of_agent = client.get_info()
+    num_of_agent = num_of_agent.partition("agents")[2]
+    num_of_agent = num_of_agent.replace("\"", '')
+    num_of_agent = num_of_agent.replace(':', '')
+    num_of_agent = num_of_agent.replace("}", '')
+    num_of_agent = int(num_of_agent)
+    print(f"num_of_agent = {num_of_agent}")
+    for i in range(num_of_agent):
+        client.add_agent('{\"id\":' + str(i) + '}')
+# client.add_agent("{\"id\":0}")
 # client.add_agent("{\"id\":1}")
 # client.add_agent("{\"id\":2}")
 # client.add_agent("{\"id\":3}")
+
+
+
+put_agent_on_graph()
 
 # this commnad starts the server - the game is running now
 client.start()
@@ -177,7 +191,7 @@ while client.is_running() == 'true':
     print(f"zip_agent_pokemon = {zip_agent_pokemon}")
     for agent ,p in zip_agent_pokemon:
         # print(p)
-        agent.pos = p.pos
+        # agent.pos = p.pos
         pygame.draw.circle(screen, Color(122, 61, 23),(int(agent.pos.x-5), int(agent.pos.y-5)), 10)
         pygame.draw.circle(screen, Color(0, 255, 255), (int(p.pos.x), int(p.pos.y)), 10)
     # for agent in agents:
@@ -201,34 +215,43 @@ while client.is_running() == 'true':
     go_to = []
     # for n in graph_algo.get_graph().get_all_v():
 
-    for a in graph_algo.get_graph().get_all_v().keys():
-        # if a < 1000: # if the node is a node in the graph - continue
-        #         #     continue
-        if a >=1000 and a < 2000: # if the node is an agent , check him to the pokemon start from index 2000
-            for p in graph_algo.get_graph().get_all_v().keys():
-                if p >= 2000: # if p in an pokemon
-                    find_the_agent: Node = graph_algo.get_graph().get_all_v().get(a)
-                            if find_the_agent== -1:
-                                close_node = graph_algo.shortest_path(n_1,n_2)[0]
+    # for a in graph_algo.get_graph().get_all_v().keys():
+    #     # if a < 1000: # if the node is a node in the graph - continue
+    #     #         #     continue
+    #     if a >=1000 and a < 2000: # if the node is an agent , check him to the pokemon start from index 2000
+    #         for p in graph_algo.get_graph().get_all_v().keys():
+    #             if p >= 2000: # if p in an pokemon
+    #                 find_the_agent: Node = graph_algo.get_graph().get_all_v().get(a)
+    #                         if find_the_agent== -1:
+    #                             close_node = graph_algo.shortest_path(n_1,n_2)[0]
 
 
     # choose next edge
+    # for agent in agents:
+    #     if agent.dest == -1:
+    #         next_node = (agent.src - 1) % len(graph.Nodes)
+    #         # agent.pos = pokemons
+    #         ## ============= in here i gave the agent the samoe pos as the pokemon ====================
+    #         print(f"=========================================={pokemons}")
+    #         print(f"***************************************8**{pokemons[0].pos}")
+    #         print(f"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx{pokemons[0].pos.x}")
+    #         print(f"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy{pokemons[0].pos.y}")
+    #         # agent.pos = (pokemons[0].pos.x, pokemons[0].pos.y ,0.0)
+    #         print(f"agent.pos = {agent.pos}")
+    #         # for p in pokemons:
+    #
+    #
+    #         client.choose_next_edge(
+    #             '{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+    #         ttl = client.time_to_end()
+    #         print(ttl, client.get_info())
+    #
+    # client.move()
     for agent in agents:
         if agent.dest == -1:
             next_node = (agent.src - 1) % len(graph.Nodes)
-            # agent.pos = pokemons
-            ## ============= in here i gave the agent the samoe pos as the pokemon ====================
-            print(f"=========================================={pokemons}")
-            print(f"***************************************8**{pokemons[0].pos}")
-            print(f"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx{pokemons[0].pos.x}")
-            print(f"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy{pokemons[0].pos.y}")
-            agent.pos = (pokemons[0].pos.x, pokemons[0].pos.y ,0.0)
-            print(f"agent.pos = {agent.pos}")
-            # for p in pokemons:
-
-
             client.choose_next_edge(
-                '{"agent_id":' + str(agent.id) + ', "next_node_id":' + str(next_node) + '}')
+                '{"agent_id":'+str(agent.id)+', "next_node_id":'+str(next_node)+'}')
             ttl = client.time_to_end()
             print(ttl, client.get_info())
 
