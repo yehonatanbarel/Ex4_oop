@@ -1,5 +1,6 @@
 """
-@author AchiyaZigi
+@authors - Yehonatan Barel
+           Nadav Moyal
 OOP - Ex4
 Very simple GUI example for python client to communicates with the server and "play the game!"
 """
@@ -68,7 +69,6 @@ def find_pokemon_edge_test(pokemon_id):
     pokemon_id_src_x = graph_x.nodes.get(pokemon_id)['pos'][0]  # x
     pokemon_id_src_y = graph_x.nodes.get(pokemon_id)['pos'][1]  # y
 
-
     for edge in list(graph_x.edges):
         edge_src = edge[0]   # [(0, 1), (0, 10),.... graph_x.edges look like this
         edge_dest = edge[1]
@@ -84,6 +84,97 @@ def find_pokemon_edge_test(pokemon_id):
             return edge_src, edge_dest
             # else:
             #     return edge_dest, edge_src
+
+        """
+        find if there is a free agent 
+        @param agents: list of agents
+        @return: the id of the free agent , if there is no free agent returns -1   
+        """
+def find_free_agent(agents):
+    for agent in agents:
+        if(agent.get_dest() == -1): #maybe "agent.dest" .. think its the same..
+            return agent.get_id()
+    # if we didnt find a free agent.
+    return -1
+"""
+        find if there is a free agent 
+        @param agent_id: list of agents
+        @param p_edge_src: src of the pokemon's edge  
+        @param p_edge_dest: dest of the pokemon's edge  
+        @return: the id of the ideal agent and the idial path 
+        Note: 
+"""
+def find_agent_edge(agent_id):
+    agent_id_src_x = graph_x.nodes.get(agent_id)['pos'][0]  # x
+    agent_id_src_y = graph_x.nodes.get(agent_id)['pos'][1]  # y
+
+    for edge in list(graph_x.edges):
+        edge_src = edge[0]  # [(0, 1), (0, 10),.... graph_x.edges look like this
+        edge_dest = edge[1]
+        edge_src_x = graph_x.nodes.get(edge_src)['pos'][0]  # x
+        edge_src_y = graph_x.nodes.get(edge_src)['pos'][1]  # y
+        edge_dest_x = graph_x.nodes.get(edge_dest)['pos'][0]  # x
+        edge_dest_y = graph_x.nodes.get(edge_dest)['pos'][1]  # y
+        dist_src_edge = math.sqrt((edge_src_x - edge_dest_x) ** 2 + ((edge_src_y - edge_dest_y) ** 2))
+        dist_src_n = math.sqrt((edge_src_x - agent_id_src_x) ** 2 + ((edge_src_y - agent_id_src_y) ** 2))
+        dist_n_dest = math.sqrt((agent_id_src_x - edge_dest_x) ** 2 + ((agent_id_src_y - edge_dest_y) ** 2))
+        if abs(dist_src_edge - (dist_src_n + dist_n_dest)) < EPS:
+            # if n.type > 0: # if type == 1
+            return edge_src, edge_dest
+
+
+
+    """
+        find the agent with the minimal path weight
+        @param agents: list of agents
+        @param p_edge_src: src of the pokemon's edge  
+        @param p_edge_dest: dest of the pokemon's edge  
+        @return: the id of the ideal agent and the ideal path
+        Note: 
+    """
+def find_ideal_agent(agents,p_edge_src,p_edge_dest):
+    min_dist =100000000 # need to change to infinity
+    ideal_path = []
+    ideal_agent = -1
+    for agent in agents:
+        agent_edge = find_agent_edge(agent.id)
+        agent_edge_src = agent_edge [0]
+        agent_edge_dest =agent_edge [1]
+        agent_path = nx.shortest_path(graph_x,agent_edge_dest,p_edge_dest,weight='weight')
+        agent_path_dist = nx.path_weight(graph_x,agent_path,weight='weight')
+        if(agent_path_dist<min_dist):
+            ideal_path =agent_path
+            min_dist=agent_path_dist
+            ideal_agent=agent.id
+        if (n in ideal_path):
+            pass
+        else:
+            ideal_path.insert(len(ideal_path),p_edge_src)
+            ideal_path.insert(len(ideal_path),p_edge_dest)
+    return ideal_agent , ideal_path
+
+"""
+        find the path that agent need to reach 
+        @param agent_id : id of the agent
+        @param p_src: src of the pokemon's edge  
+        @param p_dest: dest of the pokemon's edge  
+        @return:list that represent the path that agent need to reach 
+        Note: 
+"""
+def get_agent_path(agent_id,p_src,p_dest):
+    # a=agents.get(agent_id) # need to check if this is the way to get agent by id. I think its wrong
+    # a=agents[agent_id].id # this will work only if the agents is in a list seperate from the nodes graph and if their index will start from '0'. at start i put thier index to start from '1000'\'2000'
+    a_index=agents.index(agent_id) # this is better, this will get us the index of our agent index in the list of the agents, so then we could go that index in the list and get the agent from it. this will work also if the agent_id is more then the len of list (like '1000')
+    a=agents[a_index].id
+    path=nx.shortest_path(graph_x,a.src ,p_dest)
+    contained=0
+    for p in path:
+        if(p==p_src):
+         contained =1
+    if(contained==0):
+         path.insert(len(path),p_src)
+         path.insert(len(path),p_dest)
+    return  path
 
 
 # distance = math.sqrt( ((int(p1[0])-int(p2[0]))**2)+((int(p1[1])-int(p2[1]))**2) )
@@ -132,17 +223,20 @@ FONT = pygame.font.SysFont('Arial', 20, bold=True)
 
 graph = json.loads(
     graph_json, object_hook=lambda json_dict: SimpleNamespace(**json_dict))
-
 for n in graph.Nodes:
     x, y, _ = n.pos.split(',')
     n.pos = SimpleNamespace(x=float(x), y=float(y))
 
-# get data proportions
+ # get data proportions
 min_x = min(list(graph.Nodes), key=lambda n: n.pos.x).pos.x
 min_y = min(list(graph.Nodes), key=lambda n: n.pos.y).pos.y
 max_x = max(list(graph.Nodes), key=lambda n: n.pos.x).pos.x
 max_y = max(list(graph.Nodes), key=lambda n: n.pos.y).pos.y
 
+print(f"-------------------------------------------min_x() = {min_x}")
+print(f"-------------------------------------------max_x() = {max_x}")
+print(f"-------------------------------------------min_y() = {min_y}")
+print(f"-------------------------------------------max_y() = {max_y}")
 
 def put_all_in_graph_algo_so_we_can_use_short_path_and_load_from_json_2():
     # load the json string into SimpleNamespace Object
@@ -160,6 +254,8 @@ def scale(data, min_screen, max_screen, min_data, max_data):
 
 
 # decorate scale with the correct values
+
+
 
 def my_scale(data, x=False, y=False):
     if x:
@@ -200,30 +296,34 @@ The GUI and the "algo" are mixed - refactoring using MVC design pattern is requi
 
 while client.is_running() == 'true':
 
+
     """
     i add in here graph algo
     """
-    print(f"graph = {graph}")
+    # print(f"graph = {graph}")
     graph_x = nx.DiGraph()
     graph_algo = GraphAlgo()
     graph_algo.load_from_json_3(graph)
     for n in graph_algo.get_graph().get_all_v().keys():
         node:Node = graph_algo.get_graph().get_all_v().get(n)
-        graph_x.add_node(node.get_key(),pos=(node.get_x(),node.get_y()))
+        graph_x.add_node(node.get_key(),pos=(node.get_x(),node.get_y()),value=0,type=0)
         for dest_id,weight, in graph_algo.get_graph().all_out_edges_of_node(node.get_key()).items():
             graph_x.add_edge(node.get_key(),dest_id,weight=weight)
+            # nx.set_node_attributes(graph_x,{0: 0},name= 'value') # node.get_key() - is
+            # nx.set_node_attributes(graph_x,{1: 0},name= 'type') # node.get_key() - is
     graph_x.add_node(999, pos=(35.189,32.107)) ############################3 NOTICE THAT THIS NODE IS ADDED FOR TEST THE FUCNTION 'find_pokemon_edge_test'
-    pos=nx.get_node_attributes(graph_x,'pos')
-    print(nx.shortest_path(graph_x, source=0, target=6))
-    lst = nx.shortest_path(graph_x, source=0, target=6)
-    print(nx.path_weight(graph_x, lst,weight='weight'))
-    print(f"graph_x.edges = {graph_x.edges}")
-    print(f"graph_x.edges = {list(graph_x.edges)[0][0]}")
-    print(f"graph_x.edges = {list(graph_x.edges)[0][1]}")
-    print(f"graph_x.get_edge_data = {graph_x.get_edge_data(0,10)}")
-    print(f"graph_x.nodes.data() = {graph_x.nodes.data()}")
-    print(f"graph_x.nodes.get(0) = {graph_x.nodes.get(999)}")
 
+    # print(nx.shortest_path(graph_x, source=0, target=6))
+    lst = nx.shortest_path(graph_x, source=0, target=6)
+    # print(nx.path_weight(graph_x, lst,weight='weight'))
+    # print(f"graph_x.nodes = {graph_x.nodes}")
+    # print(f"graph_x.nodes.data() = {graph_x.nodes.data()}")
+    # print(f"graph_x.edges = {list(graph_x.edges)[0][0]}")
+    # print(f"graph_x.edges = {list(graph_x.edges)[0][1]}")
+    # print(f"graph_x.get_edge_data = {graph_x.get_edge_data(0,10)}")
+    # print(f"graph_x.nodes.data() = {graph_x.nodes.data()}")
+    # print(f"graph_x.nodes.get(0) = {graph_x.nodes.get(999)}")
+    #
     print(f"================= {find_pokemon_edge_test(999)}")
     # for edge in list(graph_x.edges):
     #         print(f"edge_src = edge[0] = {edge[0]}")
@@ -235,26 +335,42 @@ while client.is_running() == 'true':
     #             edge_dest = edge[1]
     #             edge_src_x = graph_x.nodes.get()
     #             dist_src_edge = math.sqrt( (graph_x.get_edge_data() - node_2.get_x()) ** 2 + ( (node_1.get_y()-node_2.get_y()) ** 2))
-    print(f"dijkstra_path = {nx.dijkstra_path(graph_x, 0, 6, weight='weight')}")
-    nx.draw(graph_x,pos,with_labels=True)
-    plt.show()
+    # print(f"dijkstra_path = {nx.dijkstra_path(graph_x, 0, 6, weight='weight')}")
+
 
     pokemons = json.loads(client.get_pokemons(),
                           object_hook=lambda d: SimpleNamespace(**d)).Pokemons
     pokemons = [p.Pokemon for p in pokemons]
+    # print(f"=============={pokemons}")
     """
     i add in here the pokemon to graph algo and i gave an id to them start from 2000
     """
     for p in pokemons:
         p_id = 2000
+
         x, y, _ = p.pos.split(',')
+        """
+        i put in comment the two line below. i dont understand why but the pos of the pokemon
+         is already scale and if we wont comment this two line and acutally do the
+          scale function it mess up the pokemon pos
+        """
+        """
+        ************* THE SOLUTION WAS TO CHANGE THE LINE ORDER LIKE I DID BLEOW INSTED *************
+        ************* LIKE  IT WAS ON THE SUDENT_CODE THEY GAVE US, I DONT UNDESTAND WHY *************
+         ************* IT IS HAPPENING BUT IT'S WORK NOW *************
+        """
+        p.pos = SimpleNamespace(x=float(x), y=float(y))
+        graph_x.add_node(p_id,pos=(p.pos.x,p.pos.y),value=p.value,type=p.type)
         p.pos = SimpleNamespace(x=my_scale(
             float(x), x=True), y=my_scale(float(y), y=True))
+
         # graph_algo.get_graph().add_node(p_id, (p.pos.x,p.pos.y,0.0) )
+
 
         # graph_algo.get_graph().add_node(p_id, ((my_scale(float(x), x=True)),my_scale(float(y), y=True),0.0) )
         p_id = p_id+1
         # print(f"=========================================={pokemons}")
+
 
     agents = json.loads(client.get_agents(),
                         object_hook=lambda d: SimpleNamespace(**d)).Agents
@@ -263,14 +379,36 @@ while client.is_running() == 'true':
     """
     i add in here the agent to graph algo and i gave an id to them start from 1000
     """
+    # print(f"agents ********************************* {agents}")
+    # print(f"agents ********************************* {agents[0].id}")
     for a in agents:
         x, y, _ = a.pos.split(',')
+        print(f"======== BEFORE ======{a.pos}")
+        """
+        i put in comment the two line below. i dont understand why but the pos of the pokemon
+         is already scale and if we wont comment this two line and acutally do the
+          scale function it mess up the pokemon pos
+        """
+        """
+        ************* THE SOLUTION WAS TO CHANGE THE LINE ORDER LIKE I DID BLEOW INSTED *************
+        ************* LIKE  IT WAS ON THE SUDENT_CODE THEY GAVE US, I DONT UNDESTAND WHY *************
+         ************* IT IS HAPPENING BUT IT'S WORK NOW *************
+        """
+        a.pos = SimpleNamespace(x=float(x), y=float(y))
+        graph_x.add_node(a.id+1000,pos=(a.pos.x,a.pos.y),value=a.value,src=a.src,dest=a.dest,speed=a.speed)
         a.pos = SimpleNamespace(x=my_scale(
             float(x), x=True), y=my_scale(float(y), y=True))
         # print(f"vvvvvvvvvvvvvvv{a.pos.x,a.pos.y}")
-        graph_algo.get_graph().add_node(a.id+1000, (a.pos.x,a.pos.y,0.0))
+        # graph_algo.get_graph().add_node(a.id+1000, (a.pos.x,a.pos.y,0.0))
+        print(f"======== AFTER ======{a.pos}")
+
         # graph_algo.get_graph().add_node(a.id+1000, ((my_scale(float(x), x=True)),my_scale(float(y), y=True),0.0))
-    # check events
+    print(f"graph_x.nodes = {graph_x.nodes}")
+    print(f"graph_x.nodes.data() = {graph_x.nodes.data()}")
+    pos = nx.get_node_attributes(graph_x, 'pos')
+    nx.draw(graph_x,pos,with_labels=True)
+    plt.show()
+   # check events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -281,6 +419,11 @@ while client.is_running() == 'true':
 
     # draw nodes
     for n in graph.Nodes:
+        """
+        also from here i comment this two scale function and just put x,y
+        """
+        # x=n.pos.x
+        # y=n.pos.y
         x = my_scale(n.pos.x, x=True)
         y = my_scale(n.pos.y, y=True)
 
@@ -339,6 +482,30 @@ while client.is_running() == 'true':
     # print(f"graph_algo.get_graph().get_all_v() = {graph_algo.get_graph().get_all_v().keys()}")
 
     go_to = []
+    #
+    # for n in graph_x.nodes.keys():
+    #     if n < 1000: # if the node is a node in the graph - continue
+    #         continue
+    #     if n >= 2000: # if p in an pokemon
+    #        p_src , p_dest = find_pokemon_edge(a)
+    #        free_agent_id = find_free_agent(agents) # need to check if it recognize the agents.
+    #        if ( free_agent_id != -1 ): # if we have found a free agent
+    #            a_path =get_agent_path(free_agent_id,p_src,p_dest)
+
+
+
+
+
+
+    #      if a < 1000: # if the node is a node in the graph - continue
+    #              #     continue
+    #     if a >=1000 and a < 2000: # if the node is an agent , check him to the pokemon start from index 2000
+    #         for p in graph_algo.get_graph().get_all_v().keys():
+    #             if p >= 2000: # if p in an pokemon
+    #                 find_the_agent: Node = graph_algo.get_graph().get_all_v().get(a)
+    #                         if find_the_agent== -1:
+    #                             close_node = graph_algo.shortest_path(n_1,n_2)[0]
+
     # for n in graph_algo.get_graph().get_all_v():
 
     # for a in graph_algo.get_graph().get_all_v().keys():
