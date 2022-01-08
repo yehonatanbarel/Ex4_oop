@@ -43,59 +43,71 @@ EPS = 0.001
 real function to check on pokemon
 we need to check what we want to give this function as an input, maybe we will just give it the pokemon id
 """
+
+
 def find_pokemon_edge(pokemon):
     # for p in pokemons:
     for edge in list(graph_x.edges):
-        edge_src = edge[0]   # [(0, 1), (0, 10),.... graph_x.edges look like this
+        edge_src = edge[0]  # [(0, 1), (0, 10),.... graph_x.edges look like this
         edge_dest = edge[1]
-        edge_src_x = graph_x.nodes.get(edge_src)['pos'][0] # x
-        edge_src_y = graph_x.nodes.get(edge_src)['pos'][1] # y
-        edge_dest_x = graph_x.nodes.get(edge_dest)['pos'][0] # x
-        edge_dest_y = graph_x.nodes.get(edge_dest)['pos'][1] # y
-        dist_src_edge = math.sqrt( (edge_src_x - edge_dest_x) ** 2 + ( (edge_src_y-edge_dest_y) ** 2))
-        dist_src_n = math.sqrt( (edge_src_x - pokemon.pos.x) ** 2 + ( (edge_src_y-pokemon.pos.y) ** 2))
-        dist_n_dest = math.sqrt( (pokemon.pos.x - edge_dest_x) ** 2 + ( (pokemon.pos.y - edge_dest_y) ** 2))
-        if dist_src_edge == dist_src_n + dist_n_dest + EPS or dist_src_edge == dist_src_n + dist_n_dest - EPS :
-            if n.type > 0: # if type == 1
+        edge_src_x = graph_x.nodes.get(edge_src)['pos'][0]  # x
+        edge_src_y = graph_x.nodes.get(edge_src)['pos'][1]  # y
+        edge_dest_x = graph_x.nodes.get(edge_dest)['pos'][0]  # x
+        edge_dest_y = graph_x.nodes.get(edge_dest)['pos'][1]  # y
+        dist_src_edge = math.sqrt((edge_src_x - edge_dest_x) ** 2 + ((edge_src_y - edge_dest_y) ** 2))
+        dist_src_n = math.sqrt((edge_src_x - pokemon.pos.x) ** 2 + ((edge_src_y - pokemon.pos.y) ** 2))
+        dist_n_dest = math.sqrt((pokemon.pos.x - edge_dest_x) ** 2 + ((pokemon.pos.y - edge_dest_y) ** 2))
+        if dist_src_edge == dist_src_n + dist_n_dest + EPS or dist_src_edge == dist_src_n + dist_n_dest - EPS:
+            if n.type > 0:  # if type == 1
                 return edge_src, edge_dest
             else:
                 return edge_dest, edge_src
+
+
 """
 just for test on node '999' that is on edge between nodes '0' <-> '1'
 in here it doesnt check for the type because in the example i enter the node '999' but it's not like the pokemon, it doesnt have a type
 also we need to check how much epsilon to gave to the function. the 'EPS' variable for epsilon in here is 0.001 because it fit the example i did
 """
+
+
 def find_pokemon_edge_test(pokemon_id):
     pokemon_id_src_x = graph_x.nodes.get(pokemon_id)['pos'][0]  # x
     pokemon_id_src_y = graph_x.nodes.get(pokemon_id)['pos'][1]  # y
 
     for edge in list(graph_x.edges):
-        edge_src = edge[0]   # [(0, 1), (0, 10),.... graph_x.edges look like this
+        edge_src = edge[0]  # [(0, 1), (0, 10),.... graph_x.edges look like this
         edge_dest = edge[1]
-        edge_src_x = graph_x.nodes.get(edge_src)['pos'][0] # x
-        edge_src_y = graph_x.nodes.get(edge_src)['pos'][1] # y
-        edge_dest_x = graph_x.nodes.get(edge_dest)['pos'][0] # x
-        edge_dest_y = graph_x.nodes.get(edge_dest)['pos'][1] # y
-        dist_src_edge = math.sqrt( (edge_src_x - edge_dest_x) ** 2 + ( (edge_src_y-edge_dest_y) ** 2))
-        dist_src_n = math.sqrt( (edge_src_x - pokemon_id_src_x) ** 2 + ( (edge_src_y-pokemon_id_src_y) ** 2))
-        dist_n_dest = math.sqrt( (pokemon_id_src_x - edge_dest_x) ** 2 + ( (pokemon_id_src_y - edge_dest_y) ** 2))
-        if abs(dist_src_edge - (dist_src_n + dist_n_dest)) <  EPS:
-            # if n.type > 0: # if type == 1
-            return edge_src, edge_dest
-            # else:
-            #     return edge_dest, edge_src
+        edge_src_x = graph_x.nodes.get(edge_src)['pos'][0]  # x
+        edge_src_y = graph_x.nodes.get(edge_src)['pos'][1]  # y
+        edge_dest_x = graph_x.nodes.get(edge_dest)['pos'][0]  # x
+        edge_dest_y = graph_x.nodes.get(edge_dest)['pos'][1]  # y
+        dist_src_edge = math.sqrt((edge_src_x - edge_dest_x) ** 2 + ((edge_src_y - edge_dest_y) ** 2))
+        dist_src_n = math.sqrt((edge_src_x - pokemon_id_src_x) ** 2 + ((edge_src_y - pokemon_id_src_y) ** 2))
+        dist_n_dest = math.sqrt((pokemon_id_src_x - edge_dest_x) ** 2 + ((pokemon_id_src_y - edge_dest_y) ** 2))
+        if abs(dist_src_edge - (dist_src_n + dist_n_dest)) < EPS:
+            print(f"pokemon_id = {pokemon_id}")
+            print(f"graph_x.nodes[pokemon_id]['type'] = {graph_x.nodes[pokemon_id]['type']}")
+            if graph_x.nodes[pokemon_id]['type'] > 0:  # if type == 1
+                return min(edge_src, edge_dest) , max(edge_src, edge_dest)
+            else:
+                return max(edge_src, edge_dest) , min(edge_src, edge_dest)
 
         """
         find if there is a free agent 
         @param agents: list of agents
         @return: the id of the free agent , if there is no free agent returns -1   
         """
+
+
 def find_free_agent(agents):
     for agent in agents:
-        if(agent.dest == -1): #maybe "agent.dest" .. think its the same..
+        if (agent.dest == -1):  # maybe "agent.dest" .. think its the same..
             return agent.id
     # if we didnt find a free agent.
     return -1
+
+
 """
         find if there is a free agent 
         @param agent_id: list of agents
@@ -104,6 +116,8 @@ def find_free_agent(agents):
         @return: the id of the ideal agent and the idial path 
         Note: 
 """
+
+
 def find_agent_edge(agent_id):
     agent_id_src_x = graph_x.nodes.get(agent_id)['pos'][0]  # x
     agent_id_src_y = graph_x.nodes.get(agent_id)['pos'][1]  # y
@@ -122,8 +136,6 @@ def find_agent_edge(agent_id):
             # if n.type > 0: # if type == 1
             return edge_src, edge_dest
 
-
-
     """
         find the agent with the minimal path weight
         @param agents: list of agents
@@ -132,26 +144,29 @@ def find_agent_edge(agent_id):
         @return: the id of the ideal agent and the ideal path
         Note: 
     """
-def find_ideal_agent(agents,p_edge_src,p_edge_dest):
-    min_dist =100000000 # need to change to infinity
+
+
+def find_ideal_agent(agents, p_edge_src, p_edge_dest):
+    min_dist = 100000000  # need to change to infinity
     ideal_path = []
     ideal_agent = -1
     for agent in agents:
         agent_edge = find_agent_edge(agent.id)
-        agent_edge_src = agent_edge [0]
-        agent_edge_dest =agent_edge [1]
-        agent_path = nx.shortest_path(graph_x,agent_edge_dest,p_edge_dest,weight='weight')
-        agent_path_dist = nx.path_weight(graph_x,agent_path,weight='weight')
-        if(agent_path_dist<min_dist):
-            ideal_path =agent_path
-            min_dist=agent_path_dist
-            ideal_agent=agent.id
+        agent_edge_src = agent_edge[0]
+        agent_edge_dest = agent_edge[1]
+        agent_path = nx.shortest_path(graph_x, agent_edge_dest, p_edge_dest, weight='weight')
+        agent_path_dist = nx.path_weight(graph_x, agent_path, weight='weight')
+        if (agent_path_dist < min_dist):
+            ideal_path = agent_path
+            min_dist = agent_path_dist
+            ideal_agent = agent.id
         if (n in ideal_path):
             pass
         else:
-            ideal_path.insert(len(ideal_path),p_edge_src)
-            ideal_path.insert(len(ideal_path),p_edge_dest)
-    return ideal_agent , ideal_path
+            ideal_path.insert(len(ideal_path), p_edge_src)
+            ideal_path.insert(len(ideal_path), p_edge_dest)
+    return ideal_agent, ideal_path
+
 
 """
         find the path that agent need to reach 
@@ -161,22 +176,25 @@ def find_ideal_agent(agents,p_edge_src,p_edge_dest):
         @return:list that represent the path that agent need to reach 
         Note: 
 """
-def get_agent_path(agent_id,p_src,p_dest):
+
+
+def get_agent_path(agent_id, p_src, p_dest):
     # a=agents.get(agent_id) # need to check if this is the way to get agent by id. I think its wrong
     print(f"aaaaaaaaaaaaaaaa {agents[agent_id].id}")
-    a=agents[agent_id].id # this will work only if the agents is in a list seperate from the nodes graph and if their index will start from '0'. at start i put thier index to start from '1000'\'2000'
+    a = agents[
+        agent_id].id  # this will work only if the agents is in a list seperate from the nodes graph and if their index will start from '0'. at start i put thier index to start from '1000'\'2000'
     print(f"aaaaaaaaaaaaaaaa {agents}")
     # a_index=agents.index(agent_id) # this is better, this will get us the index of our agent index in the list of the agents, so then we could go that index in the list and get the agent from it. this will work also if the agent_id is more then the len of list (like '1000')
     # a=agents[a_index].id
-    path=nx.shortest_path(graph_x,agents[agent_id].src ,p_dest)
-    contained=0
+    path = nx.shortest_path(graph_x, agents[agent_id].src, p_dest)
+    contained = 0
     for p in path:
-        if(p==p_src):
-         contained =1
-    if(contained==0):
-         path.insert(len(path),p_src)
-         path.insert(len(path),p_dest)
-    return  path
+        if (p == p_src):
+            contained = 1
+    if (contained == 0):
+        path.insert(len(path), p_src)
+        path.insert(len(path), p_dest)
+    return path
 
 
 print(pokemons)
@@ -192,11 +210,12 @@ for n in graph.Nodes:
     x, y, _ = n.pos.split(',')
     n.pos = SimpleNamespace(x=float(x), y=float(y))
 
- # get data proportions
+# get data proportions
 min_x = min(list(graph.Nodes), key=lambda n: n.pos.x).pos.x
 min_y = min(list(graph.Nodes), key=lambda n: n.pos.y).pos.y
 max_x = max(list(graph.Nodes), key=lambda n: n.pos.x).pos.x
 max_y = max(list(graph.Nodes), key=lambda n: n.pos.y).pos.y
+
 
 # print(f"-------------------------------------------min_x() = {min_x}")
 # print(f"-------------------------------------------max_x() = {max_x}")
@@ -210,6 +229,8 @@ def put_all_in_graph_algo_so_we_can_use_short_path_and_load_from_json_2():
         graph_algo.get_graph().add_node(pok_node.get_key(), pok_node.get_pos())
     for ag_node in agents:
         graph_algo.get_graph().add_node(ag_node, ag_node.get_pos())
+
+
 def scale(data, min_screen, max_screen, min_data, max_data):
     """
     get the scaled data with proportions min_data, max_data
@@ -221,7 +242,6 @@ def scale(data, min_screen, max_screen, min_data, max_data):
 # decorate scale with the correct values
 
 
-
 def my_scale(data, x=False, y=False):
     if x:
         return scale(data, 50, screen.get_width() - 50, min_x, max_x)
@@ -230,6 +250,7 @@ def my_scale(data, x=False, y=False):
 
 
 radius = 15
+
 
 def put_agent_on_graph():
     num_of_agent = client.get_info()
@@ -241,6 +262,7 @@ def put_agent_on_graph():
     print(f"num_of_agent = {num_of_agent}")
     for i in range(num_of_agent):
         client.add_agent('{\"id\":' + str(i) + '}')
+
 
 put_agent_on_graph()
 
@@ -254,7 +276,6 @@ The GUI and the "algo" are mixed - refactoring using MVC design pattern is requi
 
 while client.is_running() == 'true':
 
-
     """
     i add in here graph algo so we load_json to the graph_algo and then we get all the nodes to be added to the 
     graph_x
@@ -263,12 +284,14 @@ while client.is_running() == 'true':
     graph_algo = GraphAlgo()
     graph_algo.load_from_json_3(graph)
     for n in graph_algo.get_graph().get_all_v().keys():
-        node:Node = graph_algo.get_graph().get_all_v().get(n)
-        graph_x.add_node(node.get_key(),pos=(node.get_x(),node.get_y()),value=0,type=0)
-        for dest_id,weight, in graph_algo.get_graph().all_out_edges_of_node(node.get_key()).items():
-            graph_x.add_edge(node.get_key(),dest_id,weight=weight)
-    graph_x.add_node(999, pos=(35.189,32.107)) ############################3 NOTICE THAT THIS NODE IS ADDED FOR TEST THE FUCNTION 'find_pokemon_edge_test'
-
+        node: Node = graph_algo.get_graph().get_all_v().get(n)
+        graph_x.add_node(node.get_key(), pos=(node.get_x(), node.get_y()), value=0, type=0)
+        for dest_id, weight, in graph_algo.get_graph().all_out_edges_of_node(node.get_key()).items():
+            graph_x.add_edge(node.get_key(), dest_id, weight=weight)
+    # graph_x.add_node(999, pos=(35.189,32.107)) ############################3 NOTICE THAT THIS NODE IS ADDED FOR TEST THE FUCNTION 'find_pokemon_edge_test'
+    graph_x.add_node(999, pos=(35.188900353135324,
+                               32.105320110855615))  ############################3 NOTICE THAT THIS NODE IS ADDED FOR TEST THE FUCNTION 'find_pokemon_edge_test'
+    # print(f" the edge is = {find_pokemon_edge_test(999)}")
 
     pokemons = json.loads(client.get_pokemons(),
                           object_hook=lambda d: SimpleNamespace(**d)).Pokemons
@@ -276,7 +299,7 @@ while client.is_running() == 'true':
     """
     i add in here the pokemon to graph algo and i gave an id to them start from 2000
     """
-    for p in pokemons:
+    for p in reversed(pokemons):
         p_id = 2000
 
         x, y, _ = p.pos.split(',')
@@ -290,13 +313,16 @@ while client.is_running() == 'true':
         ************* LIKE  IT WAS ON THE SUDENT_CODE THEY GAVE US, I DONT UNDESTAND WHY *************
          ************* IT IS HAPPENING BUT IT'S WORK NOW *************
         """
+        print(f" -------------- pokemons before ------------- = {pokemons}")
         p.pos = SimpleNamespace(x=float(x), y=float(y))
-        graph_x.add_node(p_id,pos=(p.pos.x,p.pos.y),value=p.value,type=p.type)
+        print(f" -------------- pokemons after 1  ------------- = {pokemons}")
+        graph_x.add_node(p_id, pos=(p.pos.x, p.pos.y), value=p.value, type=p.type, status='free')
         p.pos = SimpleNamespace(x=my_scale(
             float(x), x=True), y=my_scale(float(y), y=True))
+        print(f" -------------- pokemons after 2  ------------- = {pokemons}")
 
-        p_id = p_id+1
-
+        p_id = p_id + 1
+    print(f" -------------- nodes = {graph_x.nodes.data()}")
 
     agents = json.loads(client.get_agents(),
                         object_hook=lambda d: SimpleNamespace(**d)).Agents
@@ -318,13 +344,13 @@ while client.is_running() == 'true':
          ************* IT IS HAPPENING BUT IT'S WORK NOW *************
         """
         a.pos = SimpleNamespace(x=float(x), y=float(y))
-        graph_x.add_node(a.id+1000,pos=(a.pos.x,a.pos.y),value=a.value,src=a.src,dest=a.dest,speed=a.speed)
+        graph_x.add_node(a.id + 1000, pos=(a.pos.x, a.pos.y), value=a.value, src=a.src, dest=a.dest, speed=a.speed)
         a.pos = SimpleNamespace(x=my_scale(
             float(x), x=True), y=my_scale(float(y), y=True))
     pos = nx.get_node_attributes(graph_x, 'pos')
-    nx.draw(graph_x,pos,with_labels=True)
+    nx.draw(graph_x, pos, with_labels=True)
     # plt.show()
-   # check events
+    # check events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -369,12 +395,12 @@ while client.is_running() == 'true':
                          (src_x, src_y), (dest_x, dest_y))
 
     # draw agents
-    zip_agent_pokemon = zip(agents,pokemons)
+    zip_agent_pokemon = zip(agents, pokemons)
     # print(f"zip_agent_pokemon = {zip_agent_pokemon}")
-    for agent ,p in zip_agent_pokemon:
+    for agent, p in zip_agent_pokemon:
         # print(p)
         # agent.pos = p.pos
-        pygame.draw.circle(screen, Color(122, 61, 23),(int(agent.pos.x), int(agent.pos.y)), 10)
+        pygame.draw.circle(screen, Color(122, 61, 23), (int(agent.pos.x), int(agent.pos.y)), 10)
         pygame.draw.circle(screen, Color(0, 255, 255), (int(p.pos.x), int(p.pos.y)), 10)
     display.update()
 
@@ -389,16 +415,22 @@ while client.is_running() == 'true':
     #         ttl = client.time_to_end()
     #         print(ttl, client.get_info())
     print(f"============ keys = {graph_x.nodes.keys()}")
-    print(f" -------------- nodes = {graph_x.nodes}")
     print(f" -------------- agents = {agents}")
+    # print(f"graph_x.nodes[2000]['type'] {graph_x.nodes}")
+    print(f"graph_x.nodes.data() {graph_x.nodes.data()}")
+
     for n in graph_x.nodes:
         if n < 1000:  # if the node is a node in the graph - continue
             continue
-        if n >= 2000:  # if p in an pokemon
+        if n >= 2000:  # if p in an  pokemon
             p_src, p_dest = find_pokemon_edge_test(n)
             free_agent_id = find_free_agent(agents)  # need to check if it recognize the agents.
-            if (free_agent_id != -1):  # if we have found a free agent
+            if (free_agent_id != -1): #and graph_x.nodes[n]['status'] != 'busy'):  # if we have found a free agent
                 a_path = get_agent_path(free_agent_id, p_src, p_dest)
+                # graph_x.nodes[n]['status'] = 'busy'
+                print(f"a_path = {a_path}")
+                print(f"p_src = {p_src}")
+                print(f"p_dest = {p_dest}")
 
                 client.choose_next_edge(
                     '{"agent_id":' + str(free_agent_id) + ', "next_node_id":' + str(a_path[1]) + '}')
