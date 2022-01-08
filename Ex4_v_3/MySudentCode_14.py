@@ -86,8 +86,8 @@ def find_pokemon_edge_test(pokemon_id):
         dist_src_n = math.sqrt((edge_src_x - pokemon_id_src_x) ** 2 + ((edge_src_y - pokemon_id_src_y) ** 2))
         dist_n_dest = math.sqrt((pokemon_id_src_x - edge_dest_x) ** 2 + ((pokemon_id_src_y - edge_dest_y) ** 2))
         if abs(dist_src_edge - (dist_src_n + dist_n_dest)) < EPS:
-            print(f"pokemon_id = {pokemon_id}")
-            print(f"graph_x.nodes[pokemon_id]['type'] = {graph_x.nodes[pokemon_id]['type']}")
+            # print(f"pokemon_id = {pokemon_id}")
+            # print(f"graph_x.nodes[pokemon_id]['type'] = {graph_x.nodes[pokemon_id]['type']}")
             if graph_x.nodes[pokemon_id]['type'] > 0:  # if type == 1
                 return min(edge_src, edge_dest) , max(edge_src, edge_dest)
             else:
@@ -180,10 +180,10 @@ def find_ideal_agent(agents, p_edge_src, p_edge_dest):
 
 def get_agent_path(agent_id, p_src, p_dest):
     # a=agents.get(agent_id) # need to check if this is the way to get agent by id. I think its wrong
-    print(f"aaaaaaaaaaaaaaaa {agents[agent_id].id}")
+    # print(f"aaaaaaaaaaaaaaaa {agents[agent_id].id}")
     a = agents[
         agent_id].id  # this will work only if the agents is in a list seperate from the nodes graph and if their index will start from '0'. at start i put thier index to start from '1000'\'2000'
-    print(f"aaaaaaaaaaaaaaaa {agents}")
+    # print(f"aaaaaaaaaaaaaaaa {agents}")
     # a_index=agents.index(agent_id) # this is better, this will get us the index of our agent index in the list of the agents, so then we could go that index in the list and get the agent from it. this will work also if the agent_id is more then the len of list (like '1000')
     # a=agents[a_index].id
     path = nx.shortest_path(graph_x, agents[agent_id].src, p_dest)
@@ -252,6 +252,61 @@ def my_scale(data, x=False, y=False):
 radius = 15
 
 
+
+"""
+*************************************************************** GUI **********************************************8
+"""
+def arrow(start, end, d, h, color):
+    """
+    קרדיט לדביר על הפונקציה
+    """
+
+    dx =(end[0] - start[0])
+    dy =(end[1] - start[1])
+    D = (math.sqrt(dx * dx + dy * dy))
+    xm =(D - d)
+    xn =(xm)
+    ym =(h)
+    yn = -h
+    sin = dy / D
+    cos = dx / D
+    x = xm * cos - ym * sin + start[0]
+    ym = xm * sin + ym * cos + start[1]
+    xm = x
+    x = xn * cos - yn * sin + start[0]
+    yn = xn * sin + yn * cos + start[1]
+    xn = x
+    points = [(end[0], end[1]), (int(xm), int(ym)), (int(xn), int(yn))]
+
+    pygame.draw.line(screen, color, start, end, width=4)
+    pygame.draw.polygon(screen, color, points)
+class Button:
+    def __init__(self,rect:pygame.Rect,text:str,color,func=None):
+        self.rect=rect
+        self.text=text
+        self.color=color
+        self.func=func
+        self.is_pressed=False
+    def press(self):
+        self.is_pressed = not self.is_pressed
+class NodeScreen:
+    def __init__(self,rect:pygame.Rect,id):
+        self.rect=rect
+        self.id=id
+button_exit =Button(pygame.Rect((0,0),(120,30)),"Exit button",(255,255,0))
+button_countdown =Button(pygame.Rect((120,0),(120,30)),"countdown",(255,0,0))
+button_grade =Button(pygame.Rect((0,30),(120,30)),"countdown",(0,255,0))
+
+result=[]
+node_screens=[]
+def on_click(func):
+    global result
+    result=func()
+    print(result)
+
+"""
+*************************************************************** GUI **********************************************8
+"""
 def put_agent_on_graph():
     num_of_agent = client.get_info()
     num_of_agent = num_of_agent.partition("agents")[2]
@@ -262,6 +317,18 @@ def put_agent_on_graph():
     print(f"num_of_agent = {num_of_agent}")
     for i in range(num_of_agent):
         client.add_agent('{\"id\":' + str(i) + '}')
+
+def get_grade():
+    grade = client.get_info()
+    grade = grade.partition("grade")[2]
+    grade = grade.split(",")
+    grade = grade[0]
+    grade = grade.replace("\"", '')
+    grade = grade.replace(':', '')
+    grade = grade.replace("}", '')
+    grade = int(grade)
+    print(f"num_of_agent = {grade}")
+    return grade
 
 
 put_agent_on_graph()
@@ -275,6 +342,7 @@ The GUI and the "algo" are mixed - refactoring using MVC design pattern is requi
 """
 
 while client.is_running() == 'true':
+
 
     """
     i add in here graph algo so we load_json to the graph_algo and then we get all the nodes to be added to the 
@@ -313,16 +381,16 @@ while client.is_running() == 'true':
         ************* LIKE  IT WAS ON THE SUDENT_CODE THEY GAVE US, I DONT UNDESTAND WHY *************
          ************* IT IS HAPPENING BUT IT'S WORK NOW *************
         """
-        print(f" -------------- pokemons before ------------- = {pokemons}")
+        # print(f" -------------- pokemons before ------------- = {pokemons}")
         p.pos = SimpleNamespace(x=float(x), y=float(y))
-        print(f" -------------- pokemons after 1  ------------- = {pokemons}")
+        # print(f" -------------- pokemons after 1  ------------- = {pokemons}")
         graph_x.add_node(p_id, pos=(p.pos.x, p.pos.y), value=p.value, type=p.type, status='free')
         p.pos = SimpleNamespace(x=my_scale(
             float(x), x=True), y=my_scale(float(y), y=True))
-        print(f" -------------- pokemons after 2  ------------- = {pokemons}")
+        # print(f" -------------- pokemons after 2  ------------- = {pokemons}")
 
         p_id = p_id + 1
-    print(f" -------------- nodes = {graph_x.nodes.data()}")
+    # print(f" -------------- nodes = {graph_x.nodes.data()}")
 
     agents = json.loads(client.get_agents(),
                         object_hook=lambda d: SimpleNamespace(**d)).Agents
@@ -355,9 +423,34 @@ while client.is_running() == 'true':
         if event.type == pygame.QUIT:
             pygame.quit()
             exit(0)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if button_exit.rect.collidepoint(event.pos):
+                print(f"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+                client.stop_connection()
 
     # refresh surface
     screen.fill(Color(0, 0, 0))
+    """
+    button
+    """
+    grade = get_grade()
+    print(f"========== {grade}")
+    # game_level =
+    pygame.draw.rect(screen,button_exit.color,button_exit.rect)
+    pygame.draw.rect(screen,button_countdown.color,button_countdown.rect)
+    pygame.draw.rect(screen,button_grade.color,button_grade.rect)
+    # if button.is_pressed:
+    button_exit_text=FONT.render(button_exit.text,True,(0,0,0))
+    button_countdown_text=FONT.render(client.time_to_end(),True,(0,0,0))
+    button_grade_text=FONT.render(f"grade: {grade}",True,(0,0,0))
+    # button_text_2=FONT.render(f"countdown: {client.time_to_end()}",True,(0,0,0))
+    # else:
+    #     button_text = FONT.render(button.text, True, (0, 0, 0))
+    screen.blit(button_exit_text,(button_exit.rect.x+15,button_exit.rect.y+5))
+    screen.blit(button_countdown_text,(button_countdown.rect.x+15,button_countdown.rect.y+5))
+    screen.blit(button_grade_text,(button_grade.rect.x+15,button_grade.rect.y+5))
+
+
 
     # draw nodes
     for n in graph.Nodes:
@@ -391,8 +484,9 @@ while client.is_running() == 'true':
         dest_y = my_scale(dest.pos.y, y=True)
 
         # draw the line
-        pygame.draw.line(screen, Color(61, 72, 126),
-                         (src_x, src_y), (dest_x, dest_y))
+        # pygame.draw.line(screen, Color(61, 72, 126),
+        #                  (src_x, src_y), (dest_x, dest_y))
+        arrow((src_x, src_y), (dest_x, dest_y), 17, 7, color=(255, 255, 255))
 
     # draw agents
     zip_agent_pokemon = zip(agents, pokemons)
@@ -414,10 +508,10 @@ while client.is_running() == 'true':
     #             '{"agent_id":'+str(agent.id)+', "next_node_id":'+str(next_node)+'}')
     #         ttl = client.time_to_end()
     #         print(ttl, client.get_info())
-    print(f"============ keys = {graph_x.nodes.keys()}")
-    print(f" -------------- agents = {agents}")
+    # print(f"============ keys = {graph_x.nodes.keys()}")
+    # print(f" -------------- agents = {agents}")
     # print(f"graph_x.nodes[2000]['type'] {graph_x.nodes}")
-    print(f"graph_x.nodes.data() {graph_x.nodes.data()}")
+    # print(f"graph_x.nodes.data() {graph_x.nodes.data()}")
 
     for n in graph_x.nodes:
         if n < 1000:  # if the node is a node in the graph - continue
@@ -425,12 +519,12 @@ while client.is_running() == 'true':
         if n >= 2000:  # if p in an  pokemon
             p_src, p_dest = find_pokemon_edge_test(n)
             free_agent_id = find_free_agent(agents)  # need to check if it recognize the agents.
-            if (free_agent_id != -1): #and graph_x.nodes[n]['status'] != 'busy'):  # if we have found a free agent
+            if (free_agent_id != -1 and graph_x.nodes[n]['status'] != 'busy'):  # if we have found a free agent
                 a_path = get_agent_path(free_agent_id, p_src, p_dest)
-                # graph_x.nodes[n]['status'] = 'busy'
-                print(f"a_path = {a_path}")
-                print(f"p_src = {p_src}")
-                print(f"p_dest = {p_dest}")
+                graph_x.nodes[n]['status'] = 'busy'
+                # print(f"a_path = {a_path}")
+                # print(f"p_src = {p_src}")
+                # print(f"p_dest = {p_dest}")
 
                 client.choose_next_edge(
                     '{"agent_id":' + str(free_agent_id) + ', "next_node_id":' + str(a_path[1]) + '}')
