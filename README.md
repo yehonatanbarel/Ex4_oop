@@ -19,7 +19,7 @@ The second part of the project is to bulid a resizable GUI visualization,so that
 1. Download the jar file.
 2. Put the data file in the same folder.
 3. In the command line, write the following command:
-"java -jar Ex4.jar "game_level_input"
+java -jar Ex4.jar "game_level_input"
 4. run the Ex4.py file
 
 # Description of the classes:
