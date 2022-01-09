@@ -2,6 +2,10 @@
 ![alt text](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUC7G6cLvCjY5-Sq4vRcieUJc_O4KjwMl8NQEKDTrAElDHc2178puykOjpVgY8XRASD_M&usqp=CAU)
 ![Pokemon_icon](https://user-images.githubusercontent.com/79272744/148688292-072e42a1-86b1-471b-a2f9-1a20844f9e48.png)
 
+
+https://user-images.githubusercontent.com/79272744/148690755-b56a2d7d-5c1b-4041-aba6-aee4090a63fb.mp4
+
+
 # Ex2
 >Made by Yehonatan Barel and Nadav Moyal.
 >
