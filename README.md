@@ -76,6 +76,7 @@ explanation about the algorithms we use in order to find the best agent to each 
 ## We did resizable GUI visualization
 ![show_resizable](https://user-images.githubusercontent.com/79272744/148693960-ae414fe3-cbf5-4358-a849-9026f513087a.gif)
 
+![level_zero](https://user-images.githubusercontent.com/79272744/148693992-58948b5e-7f5d-46b3-8e5a-69e02574b2dd.gif)
 
 
 
