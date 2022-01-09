@@ -4,6 +4,9 @@
 OOP - Ex4
 Very simple GUI example for python client to communicates with the server and "play the game!"
 """
+from PIL import ImageTk
+
+from tkinter import *
 from types import SimpleNamespace
 from client import Client
 import json
@@ -19,7 +22,8 @@ import math
 
 # init pygame
 WIDTH, HEIGHT = 1080, 720
-
+call = {}
+flag = 0
 # default port
 PORT = 6666
 # server host (default localhost 127.0.0.1)
@@ -37,7 +41,7 @@ pokemons = client.get_pokemons()
 pokemons_obj = json.loads(pokemons, object_hook=lambda d: SimpleNamespace(**d))
 
 # EPS = 0.0000000000001
-EPS = 0.001
+EPS = 0.00001
 
 """
 real function to check on pokemon
@@ -103,7 +107,8 @@ def find_pokemon_edge_test(pokemon_id):
 def find_free_agent(agents):
     for agent in agents:
         if (agent.dest == -1):  # maybe "agent.dest" .. think its the same..
-            return agent.id
+            agent.dest=1
+            return (agent.id+1000)
     # if we didnt find a free agent.
     return -1
 
@@ -181,8 +186,7 @@ def find_ideal_agent(agents, p_edge_src, p_edge_dest):
 def get_agent_path(agent_id, p_src, p_dest):
     # a=agents.get(agent_id) # need to check if this is the way to get agent by id. I think its wrong
     # print(f"aaaaaaaaaaaaaaaa {agents[agent_id].id}")
-    a = agents[
-        agent_id].id  # this will work only if the agents is in a list seperate from the nodes graph and if their index will start from '0'. at start i put thier index to start from '1000'\'2000'
+    a = agents[agent_id].id  # this will work only if the agents is in a list seperate from the nodes graph and if their index will start from '0'. at start i put thier index to start from '1000'\'2000'
     # print(f"aaaaaaaaaaaaaaaa {agents}")
     # a_index=agents.index(agent_id) # this is better, this will get us the index of our agent index in the list of the agents, so then we could go that index in the list and get the agent from it. this will work also if the agent_id is more then the len of list (like '1000')
     # a=agents[a_index].id
@@ -257,9 +261,6 @@ radius = 15
 *************************************************************** GUI **********************************************8
 """
 def arrow(start, end, d, h, color):
-    """
-    קרדיט לדביר על הפונקציה
-    """
 
     dx =(end[0] - start[0])
     dy =(end[1] - start[1])
@@ -278,7 +279,7 @@ def arrow(start, end, d, h, color):
     xn = x
     points = [(end[0], end[1]), (int(xm), int(ym)), (int(xn), int(yn))]
 
-    pygame.draw.line(screen, color, start, end, width=4)
+    pygame.draw.line(screen, color, start, end, width=2)
     pygame.draw.polygon(screen, color, points)
 class Button:
     def __init__(self,rect:pygame.Rect,text:str,color,func=None):
@@ -314,7 +315,7 @@ def put_agent_on_graph():
     num_of_agent = num_of_agent.replace(':', '')
     num_of_agent = num_of_agent.replace("}", '')
     num_of_agent = int(num_of_agent)
-    print(f"num_of_agent = {num_of_agent}")
+    # print(f"num_of_agent = {num_of_agent}")
     for i in range(num_of_agent):
         client.add_agent('{\"id\":' + str(i) + '}')
 
@@ -327,7 +328,7 @@ def get_grade():
     grade = grade.replace(':', '')
     grade = grade.replace("}", '')
     grade = int(grade)
-    print(f"num_of_agent = {grade}")
+    # print(f"num_of_agent = {grade}")
     return grade
 
 
@@ -360,16 +361,16 @@ while client.is_running() == 'true':
     graph_x.add_node(999, pos=(35.188900353135324,
                                32.105320110855615))  ############################3 NOTICE THAT THIS NODE IS ADDED FOR TEST THE FUCNTION 'find_pokemon_edge_test'
     # print(f" the edge is = {find_pokemon_edge_test(999)}")
+    pokemons = json.loads(client.get_pokemons(),object_hook=lambda d: SimpleNamespace(**d)).Pokemons
+    pokemons = [p.Pokemon for p in (pokemons)]
 
-    pokemons = json.loads(client.get_pokemons(),
-                          object_hook=lambda d: SimpleNamespace(**d)).Pokemons
-    pokemons = [p.Pokemon for p in pokemons]
+
     """
     i add in here the pokemon to graph algo and i gave an id to them start from 2000
     """
-    for p in reversed(pokemons):
-        p_id = 2000
-
+    p_id = 1999
+    for p in (pokemons):
+        p_id=p_id+1
         x, y, _ = p.pos.split(',')
         """
         i put in comment the two line below. i dont understand why but the pos of the pokemon
@@ -389,7 +390,6 @@ while client.is_running() == 'true':
             float(x), x=True), y=my_scale(float(y), y=True))
         # print(f" -------------- pokemons after 2  ------------- = {pokemons}")
 
-        p_id = p_id + 1
     # print(f" -------------- nodes = {graph_x.nodes.data()}")
 
     agents = json.loads(client.get_agents(),
@@ -430,6 +430,7 @@ while client.is_running() == 'true':
 
     # refresh surface
     screen.fill(Color(0, 0, 0))
+
     """
     button
     """
@@ -490,6 +491,7 @@ while client.is_running() == 'true':
 
     # draw agents
     zip_agent_pokemon = zip(agents, pokemons)
+
     # print(f"zip_agent_pokemon = {zip_agent_pokemon}")
     for agent, p in zip_agent_pokemon:
         # print(p)
@@ -513,23 +515,63 @@ while client.is_running() == 'true':
     # print(f"graph_x.nodes[2000]['type'] {graph_x.nodes}")
     # print(f"graph_x.nodes.data() {graph_x.nodes.data()}")
 
+    free_agent_id =17
     for n in graph_x.nodes:
         if n < 1000:  # if the node is a node in the graph - continue
             continue
         if n >= 2000:  # if p in an  pokemon
+
             p_src, p_dest = find_pokemon_edge_test(n)
             free_agent_id = find_free_agent(agents)  # need to check if it recognize the agents.
-            if (free_agent_id != -1 and graph_x.nodes[n]['status'] != 'busy'):  # if we have found a free agent
-                a_path = get_agent_path(free_agent_id, p_src, p_dest)
-                graph_x.nodes[n]['status'] = 'busy'
-                # print(f"a_path = {a_path}")
-                # print(f"p_src = {p_src}")
-                # print(f"p_dest = {p_dest}")
-
-                client.choose_next_edge(
-                    '{"agent_id":' + str(free_agent_id) + ', "next_node_id":' + str(a_path[1]) + '}')
-                ttl = client.time_to_end()
-                print(ttl, client.get_info())
-
+            if (free_agent_id != -1):  # if we have found a free agent
+                a_path = get_agent_path((free_agent_id-1000), p_src, p_dest)
+                print(f"a_path = {a_path}")
+                print(f"p_src = {p_src}")
+                print(f"p_dest = {p_dest}")
+                print(f"possison = {graph_x.nodes.get(n)['pos']}")
+                if (bool(call.get(n))):
+                    print(call.get(n))
+                    if (call.get(n) == int (free_agent_id)):
+                        print(f"the current pokemon is ={n} \n the current agent is = {call[n]}")
+                        if (len(a_path) < 2):
+                            print(f"free_agent_id is {free_agent_id}")
+                            graph_x.nodes.get(free_agent_id)['dest'] = 1
+                            call.pop(n)
+                            client.choose_next_edge(
+                                '{"agent_id":' + str((free_agent_id- 1000)) + ', "next_node_id":' + str(14) + '}')
+                            ttl = client.time_to_end()
+                            print(ttl, client.get_info())
+                        else:
+                            client.choose_next_edge('{"agent_id":' + str((call[n]-1000)) + ', "next_node_id":' + str(a_path[1]) + '}')
+                            ttl = client.time_to_end()
+                            print(ttl, client.get_info())
+                    else:
+                        continue
+                else:
+                    call[n] = int (free_agent_id)
+                    if(len(a_path)==1):
+                        call.pop(n)
+                        graph_x.nodes.get(free_agent_id)['dest']=1
+                    #print(f"the current pokemon is ={n} \n the current agent is = {call[n]}")
+                    client.choose_next_edge('{"agent_id":' + str((free_agent_id-1000)) + ', "next_node_id":' + str(13) + '}')
+                    ttl = client.time_to_end()
+                    print(ttl, client.get_info())
+            else:
+                if (bool(call.get(n))):
+                    ag = call.get(n)
+                    a_path=get_agent_path((ag-1000), p_src, p_dest)
+                    print(a_path)
+                    if(len(a_path)<2):
+                        print(f"ag is {ag}")
+                        graph_x.nodes.get(ag)['dest']=1
+                        call.pop(n)
+                        print(f"ag is {ag}")
+                        client.choose_next_edge('{"agent_id":' + str((ag - 1000)) + ', "next_node_id":' + str(1) + '}')
+                        ttl = client.time_to_end()
+                        print(ttl, client.get_info())
+                    else:
+                        client.choose_next_edge('{"agent_id":' + str((call[n] - 1000)) + ', "next_node_id":' + str(a_path[1]) + '}')
+                        ttl = client.time_to_end()
+                        print(ttl, client.get_info())
     client.move()
 # game over:
