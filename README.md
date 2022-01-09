@@ -77,4 +77,7 @@ explanation about the algorithms we use in order to find the best agent to each 
 ![git_gif](https://user-images.githubusercontent.com/79272744/148691324-07f33235-04aa-4d5b-abd7-450a9e710c4e.gif)
 
 
-
+## Diagram of the project: 
+| Node | GraphInterface | GraphAlgoInterface |  
+|:---------:|:---------:|:---------:| 
+| ![Node](https://user-images.githubusercontent.com/79272744/147393118-d5cd11db-c9a1-4ad9-a087-90c87bea0994.png)| ![GrapgInterface](https://user-images.githubusercontent.com/79272744/147393123-e0e9fe75-4b39-4d93-b36b-30e42862d03b.png)|![GraphAlgoInterface](https://user-images.githubusercontent.com/79272744/147393124-2df8a214-35c3-4c3d-9fb0-a71906e09685.png)|
