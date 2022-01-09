@@ -1,6 +1,7 @@
 # Ex4_oop
 
 ![alt text](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUC7G6cLvCjY5-Sq4vRcieUJc_O4KjwMl8NQEKDTrAElDHc2178puykOjpVgY8XRASD_M&usqp=CAU)
+![Pokemon_icon](https://user-images.githubusercontent.com/79272744/148688292-072e42a1-86b1-471b-a2f9-1a20844f9e48.png)
 
 # Ex2
 >Made by Yehonatan Barel and Nadav Moyal.
