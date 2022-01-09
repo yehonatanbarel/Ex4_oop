@@ -41,8 +41,7 @@ pokemons_obj = json.loads(pokemons, object_hook=lambda d: SimpleNamespace(**d))
 EPS = 0.00001
 
 """
-real function to check on pokemon
-we need to check what we want to give this function as an input, maybe we will just give it the pokemon id
+find the edge a pokemon is on based on it's pokemon id
 """
 def find_pokemon_edge_test(pokemon_id):
     pokemon_id_src_x = graph_x.nodes.get(pokemon_id)['pos'][0]  # x
@@ -278,13 +277,6 @@ while client.is_running() == 'true':
     for p in (pokemons):
         p_id=p_id+1
         x, y, _ = p.pos.split(',')
-        """
-        i put in comment the two line below. i dont understand why but the pos of the pokemon
-         is already scale and if we wont comment this two line and acutally do the
-          scale function it mess up the pokemon pos
-        """
-        """
-        """
         p.pos = SimpleNamespace(x=float(x), y=float(y))
         graph_x.add_node(p_id, pos=(p.pos.x, p.pos.y), value=p.value, type=p.type, status='free')
         p.pos = SimpleNamespace(x=my_scale(
@@ -299,13 +291,6 @@ while client.is_running() == 'true':
     """
     for a in agents:
         x, y, _ = a.pos.split(',')
-        """
-        i put in comment the two line below. i dont understand why but the pos of the pokemon
-         is already scale and if we wont comment this two line and acutally do the
-          scale function it mess up the pokemon pos
-        """
-        """
-        """
         a.pos = SimpleNamespace(x=float(x), y=float(y))
         graph_x.add_node(a.id + 1000, pos=(a.pos.x, a.pos.y), value=a.value, src=a.src, dest=a.dest, speed=a.speed)
         a.pos = SimpleNamespace(x=my_scale(
@@ -373,13 +358,10 @@ while client.is_running() == 'true':
 
     # draw nodes
     for n in graph.Nodes:
-        """
-        also from here i comment this two scale function and just put x,y
-        """
+
         x = my_scale(n.pos.x, x=True)
         y = my_scale(n.pos.y, y=True)
 
-        # its just to get a nice antialiased circle
         gfxdraw.filled_circle(screen, int(x), int(y),
                               radius, Color(64, 80, 174))
         gfxdraw.aacircle(screen, int(x), int(y),
@@ -407,7 +389,7 @@ while client.is_running() == 'true':
             continue
         if n >= 2000:  # if p in an  pokemon
             p_src, p_dest = find_pokemon_edge_test(n)
-            free_agent_id = find_free_agent(agents)  # need to check if it recognize the agents.
+            free_agent_id = find_free_agent(agents)
             if (free_agent_id != -1):  # if we have found a free agent
                 a_path = get_agent_path((free_agent_id-1000), p_src, p_dest)
                 if (bool(call.get(n))):
