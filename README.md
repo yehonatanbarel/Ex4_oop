@@ -69,7 +69,7 @@ The second part of the project is to bulid a resizable GUI visualization,so that
 |`centerPoint()`|Finds the node that has the shortest distance to it's farthest node.|   
 |`plot_graph()`| Plots the graph.|
 
-explanation about the algorithms we use in order to find the best agent to each pokemon you can see on our [wiki page](https://github.com/nadavmoyal/oop-Ex3/wiki).
+explanation about the algorithms we use in order to find the best agent to each pokemon you can see on our [wiki page](https://github.com/yehonatanbarel/Ex4_oop/wiki)
 ## We did tests to check them
 
 
